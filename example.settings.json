@@ -1,0 +1,13 @@
+{
+    "database":{        
+        "dbhost":"localhost",
+        "dbname":"dbname",
+        "dbuser":"root",
+        "dbpass":""
+    },
+
+    "commands":{
+        "migrate":"MigrationCommand@migrateAll",
+        "seed":"SeederCommand@runAllSeeder"
+    }
+}
