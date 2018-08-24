@@ -149,3 +149,27 @@ function getHelp($command)
     }
     return $message;
 }
+
+/**
+ * A wrapper over PHP var_dump with pretty prints.
+ * 
+ * @param mixed $var
+ */
+function dump($var)
+{
+    echo '<br /><pre>';
+    var_dump($var);
+    echo'</pre><hr />';
+}
+
+/**
+ *   A wrapper over PHP var_dump with pretty prints.
+ * Unlike dump(), dumpX() terminates the script.
+ * 
+ * @param type $var
+ */
+function dumpX($var)
+{
+      dump($var);
+      exit;
+}

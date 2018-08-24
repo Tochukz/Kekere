@@ -37,13 +37,13 @@ abstract class Seeder
      */
     public function seedTable(string $tableName, array $inputArray)
     {      
-        $query = "SELECT * FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name =  '$tableName'";
-        $statement = $this->connection->prepare($query);
-        $statement->execute();
+        $selectQuery = "SELECT * FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name =  '$tableName'";
+        $selectStatement = $this->connection->prepare($selectQuery);
+        $selectStatement->execute();
         $keyStr = "";
         $placeHolderStr = "";
         //$tableColumnInfo = $statement->fetchAll(PDO::FETCH_ASSOC);        
-        while($column = $statement->fetch(PDO::FETCH_ASSOC)){
+        while($column = $selectStatement->fetch(PDO::FETCH_ASSOC)){
             if($column['COLUMN_KEY'] == 'PRI' || $column ['EXTRA'] == 'auto_increment'){
                 continue;
             }           
@@ -53,10 +53,9 @@ abstract class Seeder
         $keys = chop($keyStr, ','); 
         $placeHolders = chop($placeHolderStr, ',');            
 
-        $query = "INSERT INTO $tableName($keys) VALUES($placeHolders)";
-        $statement = $this->connection->prepare($query); 
-        //var_dump($keys, $placeHolders, $inputArray); exit;           
-        $statement->execute($inputArray);       
+        $insertQuery = "INSERT INTO $tableName($keys) VALUES($placeHolders)";
+        $insertStatement = $this->connection->prepare($insertQuery);               
+        $insertStatement->execute($inputArray);       
     }
 
     /**

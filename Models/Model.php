@@ -26,7 +26,7 @@ abstract class Model
      /**
      * @var resource database connection
      */
-    protected $connection;
+    protected $connection = null;
 
 
     /**
@@ -39,8 +39,7 @@ abstract class Model
        $dbhost = $cred['dbhost']; 
        $dbuser = $cred['dbuser'];
        $dbname = $cred['dbname'];
-       $dbpass = $cred['dbpass'];         
-       $conn = null;
+       $dbpass = $cred['dbpass'];                
        try{
            $conn = new PDO("mysql:host=$dbhost; dbname=$dbname", $dbuser, $dbpass);
            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -49,8 +48,22 @@ abstract class Model
        }
        
        $this->connection = $conn;
+       $this->setTableName();
     }  
 
+    
+    /**
+     *  Defines an array property for the desired table fields.
+     *  
+     * @param array $fields
+     * @return $this
+     */
+    public function select(array $fields)
+    {
+         $this->selectedFields = $fields;
+         return $this;    
+    }
+    
     /**
      * Select a record whose id is $id from a the table whose name is $table .
      * 
@@ -59,13 +72,27 @@ abstract class Model
      */
     public function find(int $id)
     {
-       $this->setTableName();
        $table = $this->table;
-       $query = "SELECT * FROM $table WHERE id = :id LIMIT 1";
+       $selectedFields = "*";
+       if(isset($this->selectedFields)){  
+           $selected = $this->selectedFields;
+           if(!in_array('id', $selected)){
+                $selected[] = 'id';
+           } 
+           $selectedFields = implode(',',  $selected );
+       }
+       $query = "SELECT $selectedFields FROM $table WHERE id = :id LIMIT 1";
        $statement = $this->connection->prepare($query);
        $statement->execute(['id'=>$id]);
-       $resultArray =  $statement->fetchAll(PDO::FETCH_ASSOC);      
-       $result = ($resultArray)? (object) $resultArray[0] : null;  
+       $resultArray =  $statement->fetchAll(PDO::FETCH_ASSOC);             
+       $results = array_map(function($fields){         
+           $model = clone $this;
+           foreach($fields as $key=>$value){
+               $model->$key = $value;
+           }
+           return $model;
+       }, $resultArray);
+       $result = ($results)?  $results [0] : null;  
        return $result;
     }
 
@@ -74,27 +101,37 @@ abstract class Model
      * 
      * @return array
      */
-    public function get(int $x = 0)
-    {
-       $this->setTableName();
+    public function get(int $limit = 0)
+    {     
        $table = $this->table;
-       if($x == 0){
-           $query = "SELECT * FROM $table"; 
-       }else{
-           $query = "SELECT * FROM $table LIMIT $x"; 
+       $selectedFields = "*";
+       if(isset($this->selectedFields)){
+           $selected = $this->selectedFields;
+           if(!in_array('id', $selected)){
+                $selected[] = 'id';
+           } 
+           $selectedFields = implode(',',  $selected );
        }
-         
+       if($x == 0){
+           $query = "SELECT  $selectedFields  FROM $table"; 
+       }else{
+           $query = "SELECT $selectedFields   FROM $table LIMIT $limit"; 
+       }         
        $statement = $this->connection->prepare($query);
        $statement->execute();
        $resultArray =  $statement->fetchAll(PDO::FETCH_ASSOC);
-       $results = array_map(function($record){
-           return (object) $record;
+       $results = array_map(function($fields){         
+           $model = clone $this;
+           foreach($fields as $key=>$value){
+               $model->$key = $value;
+           }
+           return $model;
        }, $resultArray);
 
        return $results;
     }
 
-
+      
     /**
      * Retuns a number of  record from a database table specified by the $table property.
      * 
@@ -104,24 +141,44 @@ abstract class Model
         return $this->get($x);    
     }
     
+    /**
+     * Query the database for records that match the given key value pair
+     * 
+     * @param string $key
+     * @param string $value
+     * @return array An array of App\Models\Model objects
+     */
     public function getWhere(string $key, string $value)
-    {
-        $this->setTableName();
+    {       
         $table = $this->table;
         $query = "SELECT * FROM $table WHERE `$key` = :inputVal";
         $statement = $this->connection->prepare($query);
         $statement->execute(['inputVal'=>$value]);
-        $resultArray =  $statement->fetchAll(PDO::FETCH_ASSOC);
-        $results = array_map(function($record){
-            return (object) $record;
+        $resultArray =  $statement->fetchAll(PDO::FETCH_ASSOC);        
+        $results = array_map(function($fields){
+            $model = clone $this;
+            foreach($fields as $key=>$value){
+                $model->$key = $value;
+           }
+           return $model;         
         }, $resultArray);
  
         return $results;
     }
 
-    public function update()
-    {
-
+    public function update(array $paramArray)
+    {        
+        $keys = array_keys($paramArray);
+        $keyString = " ";
+        foreach($keys as $key){
+             $keyString .= "$key = :$key,";
+        }
+        $keyStr = trim($keyString, ',');
+        $table = $this->table;    
+        $id = $this->id;
+        $query = "UPDATE $table SET $keyStr WHERE id = $id ";        
+        $statement = $this->connection->prepare($query);   
+        $statement->execute($paramArray);
     }
     
     /**
@@ -145,6 +202,7 @@ abstract class Model
         $tableName = trim(str_replace($upperCases, $lowerCases, $className), "\\_") . "s";    
         $this->table = $tableName;      
     }
+    
      /**
      * Free the connection resource.
      */

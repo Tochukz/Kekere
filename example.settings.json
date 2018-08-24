@@ -7,7 +7,11 @@
     },
 
     "commands":{
-        "migrate":"MigrationCommand@migrateAll",
-        "seed":"SeederCommand@runAllSeeder"
+        "drop-table":"MigrationCommand@dropTable",
+        "migrate-all":"MigrationCommand@migrateAll",
+        "migrate":"MigrationCommand@createRequiredTables",
+        "seed-all":"SeederCommand@runAllSeeder",
+        "seed":"SeederCommandrun@runSeeder",        
+        "truncate-table":"MigrationCommand@truncateTable"
     }
 }

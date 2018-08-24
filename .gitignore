@@ -1,3 +1,4 @@
 .example.htaccess
 nbproject/
-Controllers/TestController.php
+settings.json
+
