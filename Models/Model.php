@@ -27,7 +27,17 @@ abstract class Model
      * @var resource database connection
      */
     protected $connection = null;
-
+    
+    /**
+     * @var array Selected field for table selection operation
+     */
+     protected $selectedFields;
+     
+     /**
+      *
+      * @var string Order for sorting of results returned   from table selection operation
+      */
+     protected $order;
 
     /**
      * The databse connection created duing class instatiation.
@@ -83,7 +93,7 @@ abstract class Model
        }
        $query = "SELECT $selectedFields FROM $table WHERE id = :id LIMIT 1";
        $statement = $this->connection->prepare($query);
-       $statement->execute(['id'=>$id]);
+       $statement->execute(['id'=>$id]);      
        $resultArray =  $statement->fetchAll(PDO::FETCH_ASSOC);             
        $results = array_map(function($fields){         
            $model = clone $this;
@@ -95,47 +105,74 @@ abstract class Model
        $result = ($results)?  $results [0] : null;  
        return $result;
     }
-
+ 
+     /**
+      * Adds an order for sorting of records to be used in the get method.
+      * 
+      * @param string $field
+      * @param string $order
+      * @return $this
+      * 
+      */
+     public function orderBy(string $field, string $order)
+     {
+         $this->order = "ORDER BY $field $order";
+         return $this;
+     }
+     
     /**
-     * Select all the records from the table specified by the $table property.
+     * Select  records from the table specified by the $table property.
      * 
      * @return array
      */
     public function get(int $limit = 0)
-    {     
-       $table = $this->table;
-       $selectedFields = "*";
-       if(isset($this->selectedFields)){
-           $selected = $this->selectedFields;
-           if(!in_array('id', $selected)){
-                $selected[] = 'id';
-           } 
-           $selectedFields = implode(',',  $selected );
-       }
-       if($x == 0){
-           $query = "SELECT  $selectedFields  FROM $table"; 
-       }else{
-           $query = "SELECT $selectedFields   FROM $table LIMIT $limit"; 
-       }         
+    {           
+       $query= $this->buildSelectQuery($limit);
        $statement = $this->connection->prepare($query);
-       $statement->execute();
-       $resultArray =  $statement->fetchAll(PDO::FETCH_ASSOC);
-       $results = array_map(function($fields){         
-           $model = clone $this;
-           foreach($fields as $key=>$value){
-               $model->$key = $value;
-           }
-           return $model;
-       }, $resultArray);
-
-       return $results;
+       $statement->execute();     
+       $results = [];
+       while($resultArray = $statement->fetch(PDO::FETCH_ASSOC)){
+            $model = clone $this;
+            foreach($resultArray as $key=>$value){
+                $model->$key = $value;
+            }
+            $results[] =  $model;
+       }
+        return $results;
     }
 
-      
     /**
-     * Retuns a number of  record from a database table specified by the $table property.
+     * Builds a query for database table selection operation.
      * 
-     * @return \stdClass
+     * @return string
+     */
+    public function buildSelectQuery(int $limit)
+    {
+         $table = $this->table;
+         $selectedFields = "*";
+         if(isset($this->selectedFields)){
+             $selected = $this->selectedFields;
+             if(!in_array('id', $selected)){
+                  $selected[] = 'id';
+             } 
+             $selectedFields = implode(',',  $selected );
+         }
+         $order = " ";
+         if(isset($this->order)){
+             $order = $this->order;
+        }
+         if($limit == 0){
+            $query = "SELECT  $selectedFields  FROM $table $order"; 
+        }else{
+            $query = "SELECT $selectedFields   FROM $table $order LIMIT $limit"; 
+        }     
+        return $query;
+    }
+    
+    /**
+     * Return an array of entities of the table specified by the $table property.
+     * 
+     * @return array
      */
     public function take(int $x){
         return $this->get($x);    

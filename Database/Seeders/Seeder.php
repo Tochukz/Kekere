@@ -40,8 +40,7 @@ abstract class Seeder
         $selectStatement = $this->connection->prepare($selectQuery);
         $selectStatement->execute();
         $keyStr = "";
-        $placeHolderStr = "";
-        //$tableColumnInfo = $statement->fetchAll(PDO::FETCH_ASSOC);        
+        $placeHolderStr = "";          
         while($column = $selectStatement->fetch(PDO::FETCH_ASSOC)){
             if($column['COLUMN_KEY'] == 'PRI' || $column ['EXTRA'] == 'auto_increment'){
                 continue;
