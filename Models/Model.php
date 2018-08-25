@@ -165,7 +165,43 @@ abstract class Model
  
         return $results;
     }
+   
+     /**
+      * Inserts a record into the database table associated with the current model.
+      * 
+      * @param string $paramArray
+      * @return void
+      */
+     public function create(string $paramArray)
+    {
+        $table = $this->table;
+        $selectQuery = "SELECT * FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name =  '$table'";
+        $selectStatement = $this->connection->prepare($selectQuery);
+        $selectStatement->execute();
+        $keyStr = "";
+        $placeHolderStr = "";
+        $tableColumns = $selectStatement->fetchAll(PDO::FETCH_ASSOC);         
+        foreach($tableColumns as $column){
+            if($column['COLUMN_KEY'] == 'PRI' || $column ['EXTRA'] == 'auto_increment'){
+                continue;
+            }           
+            $keyStr .= "`".$column['COLUMN_NAME']."`,";
+            $placeHolderStr .= ":".$column['COLUMN_NAME'].",";  
+        }        
+        $keys = chop($keyStr, ','); 
+        $placeHolders = chop($placeHolderStr, ',');            
 
+        $insertQuery = "INSERT INTO $table($keys) VALUES($placeHolders)";
+        $insertStatement = $this->connection->prepare($insertQuery);               
+        $insertStatement->execute($paramArray);     
+     }
+     
+    /**
+     * Updates a single record in the database table
+     * 
+     * @param array $paramArray
+     * @return void
+     */
     public function update(array $paramArray)
     {        
         $keys = array_keys($paramArray);
@@ -205,6 +241,8 @@ abstract class Model
     
      /**
      * Free the connection resource.
+     * 
+     * @return void 
      */
     public function __destruct()
     {

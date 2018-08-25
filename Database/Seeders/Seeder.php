@@ -17,8 +17,7 @@ abstract class Seeder
         $dbhost = $database['dbhost'];
         $dbname = $database['dbname'];
         $dbuser = $database['dbuser'];
-        $dbpass = $database['dbpass'];
-        $conn = null;
+        $dbpass = $database['dbpass'];     
         try{
             $conn =  new PDO("mysql:host=$dbhost; dbname=$dbname", $dbuser, $dbpass);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

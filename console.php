@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file defines the CLI of the framework.
  * It maps commands from the command section of the settings.json file to class methods.
