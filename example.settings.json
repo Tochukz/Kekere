@@ -9,9 +9,9 @@
     "commands":{
         "drop-table":"MigrationCommand@dropTable",
         "migrate-all":"MigrationCommand@migrateAll",
-        "migrate":"MigrationCommand@createRequiredTables",
-        "seed-all":"SeederCommand@runAllSeeder",
-        "seed":"SeederCommandrun@runSeeder",        
+        "migrate":"MigrationCommand@migrate",
+        "seed-all":"SeederCommand@seedAll",
+        "seed":"SeederCommand@seed",        
         "truncate-table":"MigrationCommand@truncateTable"
     }
 }

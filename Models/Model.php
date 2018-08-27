@@ -74,6 +74,20 @@ abstract class Model
          return $this;    
     }
     
+     /**
+      * Adds an order for sorting of records to be used in the get method.
+      * 
+      * @param string $field
+      * @param string $order
+      * @return $this
+      * 
+      */
+     public function orderBy(string $field, string $order)
+     {
+         $this->order = "ORDER BY $field $order";
+         return $this;
+     }
+     
     /**
      * Select a record whose id is $id from a the table whose name is $table .
      * 
@@ -85,11 +99,9 @@ abstract class Model
        $table = $this->table;
        $selectedFields = "*";
        if(isset($this->selectedFields)){  
-           $selected = $this->selectedFields;
-           if(!in_array('id', $selected)){
-                $selected[] = 'id';
-           } 
-           $selectedFields = implode(',',  $selected );
+           $selected = $this->selectedFields;           
+           $selected[] = 'id';           
+           $selectedFields = implode(',',  array_unique($selected) );
        }
        $query = "SELECT $selectedFields FROM $table WHERE id = :id LIMIT 1";
        $statement = $this->connection->prepare($query);
@@ -106,19 +118,7 @@ abstract class Model
        return $result;
     }
  
-     /**
-      * Adds an order for sorting of records to be used in the get method.
-      * 
-      * @param string $field
-      * @param string $order
-      * @return $this
-      * 
-      */
-     public function orderBy(string $field, string $order)
-     {
-         $this->order = "ORDER BY $field $order";
-         return $this;
-     }
+    
      
     /**
      * Select  records from the table specified by the $table property.
@@ -152,10 +152,8 @@ abstract class Model
          $selectedFields = "*";
          if(isset($this->selectedFields)){
              $selected = $this->selectedFields;
-             if(!in_array('id', $selected)){
-                  $selected[] = 'id';
-             } 
-             $selectedFields = implode(',',  $selected );
+             $selected[] = 'id';            
+             $selectedFields = implode(',',  array_unique($selected));
          }
          $order = " ";
          if(isset($this->order)){

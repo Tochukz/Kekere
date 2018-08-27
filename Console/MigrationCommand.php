@@ -34,6 +34,19 @@ class MigrationCommand
         }
     }
 
+     
+    /**
+     * Creates tables defined in a given migration class.
+     * 
+     * @param string $migrationClassName
+     * @return void     
+     */
+    public function migrate($migrationClassName)
+    {
+        $fullPartName = "Database\\Migrations\\".$migrationClassName;
+        $this->createRequiredTables($fullPartName );
+    }
+    
     /**
      * Creates tables whose schema is defined in a class that extends Database\Migrations\Migration class.
      * 
@@ -41,7 +54,8 @@ class MigrationCommand
      */
     function createRequiredTables($className)
     {     
-        $class = new $className();
+        $classFullName = "App\\".$className;
+        $class = new $classFullName();
         $classMethods = get_class_methods($class);
         $upperCases = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
         'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
@@ -52,23 +66,18 @@ class MigrationCommand
         foreach($classMethods as $methodName){
             if(!preg_match("/(create)[a-zA-Z]+(Table)/", $methodName)){
                 continue;
-            }    
-        
+            }            
             $tableCreate = str_replace($upperCases, $lowerCases, $methodName);
             $tableName = str_replace(["create_", "_table"], "", $tableCreate);
-            $tableNames[] = $tableName;
-            
+            $tableNames[] = $tableName;            
             try{           
-                echo "Calling $methodName method to create the $tableName table...\n";
-                //$install->$methodName();  
+                echo "Calling $methodName method to create the $tableName table...\n";            
                 $class->$methodName();        
             }catch(Exception $ex){                   
                 echo $ex->getMessage()."\n";
-                echo "Dropping tables:\n";
-                // $install->rollBackTables($tableNames);   
+                echo "Dropping tables:\n";   
                 $class->rollBackTables($tableNames);         
             }
-
         }
     }
     

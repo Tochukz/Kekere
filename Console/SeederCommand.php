@@ -10,15 +10,16 @@ class SeederCommand
    * 
    * @return void
    */
-  public function runAllSeeder()
+  public function seedAll()
   {
     $seederClassNames = getAllClasses("Database/Seeders");
     foreach($seederClassNames as $seederClassName){
       if($seederClassName == 'Database\Seeders\Seeder'){
-        //Seeder is an abstract class
+        //Seeder is an abstract class, can  not be instantiated and therefore skiped
         continue;
       }
-      $this->seed($seederClassName);
+      $fullClassName = "App\\".$seederClassName;
+      $this->runSeed($fullClassName);
     }
   }
 
@@ -30,7 +31,7 @@ class SeederCommand
    * @param string $seederClassName
    * @return void
    */
-  public function seed($seederClassName)
+  public function runSeed($seederClassName)
   {    
     $seederObj = new $seederClassName();
     $seederMethods = get_class_methods($seederClassName);
@@ -40,7 +41,6 @@ class SeederCommand
         $seederObj->$seederMethod();
       }      
     }
-
   }
 
   /**
@@ -49,12 +49,13 @@ class SeederCommand
    * @param string $seederClassName
    * @return void
    */
-  public function runSeeder($seederClassName)
+  public function seed($seederClassName)
   {
     if(!$seederClassName){
       echo "Please specify the seeder class name\n";
     }
-    $this->seed("Database\\Seeders\\".$seederClassName);
+    $fullClassName = "App\\Database\\Seeders\\".$seederClassName;
+    $this->runSeed($fullClassName);
   }
 
 }

@@ -26,12 +26,12 @@ if(isset($argv[2]) && stristr($argv[2], 'help')) {
     }   
     exit;
 }elseif(stristr($argv[1], 'version')){
-     echo "Kekere - v0.0.1";   
+     echo "Kekere - v0.0.1 \n";   
 }
 elseif(array_key_exists($argv[1], $commands)){
     $classMethod = $commands[$argv[1]];
     $classAndMethod = explode("@", $classMethod);
-    $class = "Console\\".$classAndMethod[0];
+    $class = "App\Console\\".$classAndMethod[0];
     $method = $classAndMethod[1];
     $obj = new $class();
     $methodArg = $argv[2]?? null;

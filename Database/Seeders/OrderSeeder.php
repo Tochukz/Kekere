@@ -1,8 +1,23 @@
 <?php
+namespace App\Database\Seeders;
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+class OrderSeeder extends Seeder
+{
+    public function seedOrdersTable()
+    {          
+        $orders = [
+            ['user_id'=> "2", 'date'=>$this->currentTime()],
+            ['user_id'=> "3", 'date'=>$this->currentTime()],
+            ['user_id'=> "5", 'date'=>$this->currentTime()],
+        ];
+        foreach($orders as $order){
+            $this->seedTable('orders', $order);
+        }        
+    }
+    
+    public function currentTime() 
+   {
+        return date("Y-m-d H:i:s");
+    }
+    
+}

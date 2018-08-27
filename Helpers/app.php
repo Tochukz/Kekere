@@ -116,11 +116,18 @@ function getHelp($command)
     $message = "";
     switch($command){
         case 'migrate':
-            $message .= "Syntax:\n \t php console.php migrate\n";
+            $message .= "Syntax:\n \t php console.php migrate MigrationClassName \n";
+            $message .= "Details:\n";
+            $message .= "\t Runs a specific migration class defined in Database/Migrations directory\n";
+            $message .= "\t The migration class must extend the  \Database\Migrations\Migration abstract class\n";
+            $message .= "\t The table creation method in a migration class must follow the naming convention: create[tableName]Table\n";            
+            break;
+        case 'migrate-all':
+            $message .= "Syntax:\n \t php console.php migrate-all \n";
             $message .= "Details:\n";
             $message .= "\t Runs all the migration classes defined in Database/Migrations directory\n";
             $message .= "\t A migration class must extend the  \Database\Migrations\Migration abstract class\n";
-            $message .= "\t The table creation method in a migration class must follow the naming convention create[tableName]Table\n";            
+            $message .= "\t The table creation method in a migration class must follow the naming convention: create[tableName]Table\n";            
             break;
         case 'seed':
            $message .= "Syntax:\n \t php console.php seed SeederClassName\n";
