@@ -204,10 +204,10 @@ abstract class Model
      /**
       * Inserts a record into the database table associated with the current model.
       * 
-      * @param string $paramArray
-      * @return void
+      * @param array $paramArray
+      * @return int lastInsertID
       */
-     public function create(string $paramArray)
+     public function create(array $paramArray)
     {
         $table = $this->table;
         $selectQuery = "SELECT * FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name =  '$table'";
@@ -229,6 +229,7 @@ abstract class Model
         $insertQuery = "INSERT INTO $table($keys) VALUES($placeHolders)";
         $insertStatement = $this->connection->prepare($insertQuery);               
         $insertStatement->execute($paramArray);     
+        return $this->connection->lastInsertId();
      }
      
     /**

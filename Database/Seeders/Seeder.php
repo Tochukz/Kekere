@@ -32,7 +32,7 @@ abstract class Seeder
      * 
      * @param string $tableName
      * @param array $inputArray
-     * @return void
+     * @return int lastInsertID
      */
     public function seedTable(string $tableName, array $inputArray)
     {      
@@ -53,7 +53,8 @@ abstract class Seeder
 
         $insertQuery = "INSERT INTO $tableName($keys) VALUES($placeHolders)";
         $insertStatement = $this->connection->prepare($insertQuery);               
-        $insertStatement->execute($inputArray);       
+        $insertStatement->execute($inputArray); 
+        return$this->connection->lastInsertId();
     }
 
     /**
