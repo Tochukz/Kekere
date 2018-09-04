@@ -32,7 +32,9 @@
         </div>
         <div class="collapse navbar-collapse navbar-right" id="nav-menu">
             <ul class="nav navbar-nav">
-                <li><a href="#">Menu</a></li>               
+                <li><a href="#">Quick Start</a></li>    
+                <li><a href="#">Docs</a></li>      
+                <li><a href="#">Help</a></li>      
             </ul>
         </div>
     </div>

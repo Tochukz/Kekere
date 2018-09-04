@@ -7,6 +7,7 @@
  * @link http://kekere.tochukwu.xyz 
  */
 
+use App\Http\Response;
 
 /**
  * Requires a specified template for display.
@@ -17,15 +18,32 @@
  * @return void
  */
 function view($templateChain, $array = null){  
-    if($array != null){
+    $template = str_replace('.', '/', $templateChain);
+    $layout = Response::view($template);    
+     if($array != null){
         foreach($array as $key=>$value){          
             $$key = $value;
         }
     }
-    $template = str_replace('.', '/', $templateChain);
-    require_once(__DIR__.'/../Views/'.$template.'.php');
+    if( $layout ){
+        $content = $template;
+        require_once(appDir('Views/'.$layout.'.php'));
+    }else{
+        require_once(appDir('Views/'.$template.'.php'));
+    }
 }
 
+/**
+ * Includes a given partial or content template  in another template.
+ * 
+ * @param type $content
+ */
+function render($content)
+{
+    $contentFile = str_replace('.', "/", $content);
+    include_once(appDir('Views/'.$contentFile.'.php'));
+    
+}
 
 /**
  * Build an array of all the files in a given directory.
@@ -36,7 +54,7 @@ function view($templateChain, $array = null){
 function getAllFiles($dirName){
     $files = [];
     try{
-        $dirHandle = opendir( __DIR__.'/../'.$dirName);
+        $dirHandle = opendir( appDir($dirName));
         while($fileOrDir = readdir($dirHandle)){
             if(is_dir($fileOrDir)){
                 continue;
@@ -72,7 +90,7 @@ function getAllClasses(string $dirName){
  */
 function getSettings()
 {
-    $settings = __DIR__."/../settings.json";
+    $settings = appDir("settings.json");
     $settingsArray = json_decode(file_get_contents($settings), true);
     return $settingsArray;
 }
@@ -99,13 +117,15 @@ function getCommands()
 }
 
 /**
- * Returns the application's home directory
+ * Returns the  specified directory with respect to the application's home directory.
+ * Return an absolute path to the file or directory $dit
  * 
- * @return tring
+ * @param string $dir
+ * @return string
  */
-function appDir()
+function appDir($dir)
 {
-    return __DIR__."/../";
+    return __DIR__."/../".$dir;
 }
 
 /**
