@@ -14,13 +14,11 @@
     <![endif]-->   
 </head>
 <body>
-<?php render('Partials.navigation'); ?>
+@partial('Partials.navigation')
 <section>
 <div class="container">    
-    <div class="row">        
-        <?php $books = $books ?>          
-         <?php  render($content) ?>     
-        
+    <div class="row">                          
+         @render('content')
     </div>
 </div>
 </section>

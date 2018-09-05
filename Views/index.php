@@ -1,7 +1,7 @@
 <!--@Layout('Layouts.master')-->
 <div class="col-sm-12">
     <h4>Kekere is a light weight minimal PHP framework...</h4>
-    <table>
+    <table class='table table-bordered"'>
         <thead>
             <tr>
                 <th>ID</th>
@@ -9,20 +9,18 @@
                 <th>Author</th>
             </tr>
         </thead>
-        <tbody><!--
-    <?php/*
-      $tableStr = " ";
+        <tbody>
+    <?php
+      $bookStr = " ";
       foreach($books as $book){
-         $tableStr .= '<tr>
-                                       <td>'.$table->id.'</td>
-                                      <td>'.$table->title.'</td>
-                                     <td>'.$table->author.'</td>
+         $bookStr .= '<tr>
+                                       <td>'.$book->id.'</td>
+                                      <td>'.$book->title.'</td>
+                                     <td>'.$book->price.'</td>
                                 </tr>';
-      }
-      echo $tableStr;  */
-     
-    ?>-->
-       <?php dump($books); ?>
+        }
+      echo $bookStr;     
+      ?>   
           </tbody>
       </table>
 </div>      

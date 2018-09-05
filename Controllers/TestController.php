@@ -11,9 +11,9 @@ use App\Models\DB;
  */
 class TestController {
     public function test(){
-        $books = DB::table('books')->select(['id', 'author', 'price'])->orderBy('price', 'ASC')->take(4);
+        $books = DB::table('books')->select(['id', 'price', 'title'])->orderBy('price', 'ASC')->take(4);
 //        //$books = DB::table('books')->select(['title', 'author', 'id'])->take(2);   
-//        dump($book)  ;    
+//        dump($book)  ;        
           return view('index', ['books'=>$books]);        
         
     }

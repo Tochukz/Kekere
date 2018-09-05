@@ -17,20 +17,37 @@ use App\Http\Response;
  * @param array $array
  * @return void
  */
-function view($templateChain, $array = null){  
-    $template = str_replace('.', '/', $templateChain);
-    $layout = Response::view($template);    
+function view($templateChain, $array = null){      
      if($array != null){
         foreach($array as $key=>$value){          
             $$key = $value;
         }
-    }
-    if( $layout ){
-        $content = $template;
-        require_once(appDir('Views/'.$layout.'.php'));
-    }else{
-        require_once(appDir('Views/'.$template.'.php'));
-    }
+    }    
+    $template = str_replace('.', '/', $templateChain);    
+    $partsAndInludes = Response::view($template);    
+    $parts = $partsAndInludes['parts'];
+    $includes = $partsAndInludes['includes'];
+    
+    $templateName = $template.'.php';
+    $maxCount = (count($parts)  > count($includes))? count($parts) : count($includes);
+    for($x=0; $x<$maxCount; $x++){       
+        if(isset($parts[$x])){
+            $tmpName = appDir('Views/tmp/part'.$x.'.php');
+            $fileHandle = fopen($tmpName, 'w');           
+            //$content = preg_replace("/^(\@partial\(['\"]|\@render\(['\"])[a-zA-Z0-9-_.]+(['\"]\))$/", '', $parts[$x]);
+            //echo  $parts[$x]  == $content ;
+            fwrite($fileHandle, $parts[$x]);
+            fclose($fileHandle);  
+        }                   
+        include_once($tmpName);       
+        if(isset($includes[$x]) && $includes[$x] == 'content'){
+           include_once(appDir('Views/'.$templateName));
+           continue;
+       }elseif(isset($includes[$x])){
+           $file = str_replace('.', '/', $includes[$x]).'.php';
+           include_once(appDir('Views/'.$file));
+       }        
+    }    
 }
 
 /**
@@ -38,12 +55,12 @@ function view($templateChain, $array = null){
  * 
  * @param type $content
  */
-function render($content)
-{
-    $contentFile = str_replace('.', "/", $content);
-    include_once(appDir('Views/'.$contentFile.'.php'));
-    
-}
+//function render($content)
+//{
+//    $contentFile = str_replace('.', "/", $content);
+//    include_once(appDir('Views/'.$contentFile.'.php'));
+//    
+//}
 
 /**
  * Build an array of all the files in a given directory.
@@ -70,7 +87,7 @@ function getAllFiles($dirName){
 }
 
 /**
- * Build an array of all the class defined in a given diretory
+ * Build an array of all the class defined in a given directory
  * It is assumed that your class name and the name of the file holding the class is the same e.g User and User.php.
  * 
  * @param string $dirName
