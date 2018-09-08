@@ -14,7 +14,7 @@
     <![endif]-->   
 </head>
 <body>
-@partial('Partials.navigation')
+@partial('partials.navigation')
 <section>
 <div class="container">    
     <div class="row">                          

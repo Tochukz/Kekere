@@ -1,7 +1,7 @@
-<!--@Layout('Layouts.master')-->
+@layout('layouts.master')
 <div class="col-sm-12">
     <h4>Kekere is a light weight minimal PHP framework...</h4>
-    <table class='table table-bordered"'>
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>ID</th>

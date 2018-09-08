@@ -49,7 +49,7 @@ class Route
             exit("Method not allowed<br />");
         }elseif($found === false){
             $page = $url;
-            return view('Errors.404', ['page'=>$page]);
+            return view('errors.404', ['page'=>$page]);
         }
     
     }

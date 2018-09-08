@@ -14,16 +14,29 @@ namespace App\Http;
  * @author chucks
  */
 class Response {
+    
+    /**
+     * Prepares the view for rendering
+     * 
+     * @param type $template
+     * @return type
+     */
     public static function view($template)
     {                   
         $layout = static::getLayout($template);
-        if(!$layout){
+        if($layout == null){
             return appDir('Views/'.$template.'.php');    
         }        
         $partsAndInludes = static::getIncludes($layout); 
         return $partsAndInludes;         
     }   
     
+    /**
+     * Reads a view and check if it has a layout defined.
+     * 
+     * @param string $template
+     * @return type
+     */
     protected static function getLayout(string $template)
     {
         $view = appDir('Views/'.$template.'.php');    
@@ -44,6 +57,12 @@ class Response {
          return  $layout;           
     }
     
+    /**
+     * Reads a view a get the name of any partial and content included in the view.
+     * 
+     * @param string $layout
+     * @return array
+     */
     protected static function getIncludes(string $layout)
     {
         $fileContent = file_get_contents(appDir('Views/'.$layout).'.php');

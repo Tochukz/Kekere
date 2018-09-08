@@ -10,8 +10,8 @@
 use App\Http\Response;
 
 /**
- * Requires a specified template for display.
- * The elements of the array passed to the template becomes individual variables accessable in the template.
+ * Renders a view, as specified by a template for display.
+ * The elements of the array passed to the template becomes individual variables assessable in the template.
  * 
  * @param string $templateChain
  * @param array $array
@@ -25,6 +25,11 @@ function view($templateChain, $array = null){
     }    
     $template = str_replace('.', '/', $templateChain);    
     $partsAndInludes = Response::view($template);    
+    if(!is_array($partsAndInludes)){
+        include($partsAndInludes);
+        return;
+    }
+    
     $parts = $partsAndInludes['parts'];
     $includes = $partsAndInludes['includes'];
     
@@ -34,33 +39,27 @@ function view($templateChain, $array = null){
         if(isset($parts[$x])){
             $tmpName = appDir('Views/tmp/part'.$x.'.php');
             $fileHandle = fopen($tmpName, 'w');           
-            //$content = preg_replace("/^(\@partial\(['\"]|\@render\(['\"])[a-zA-Z0-9-_.]+(['\"]\))$/", '', $parts[$x]);
-            //echo  $parts[$x]  == $content ;
-            fwrite($fileHandle, $parts[$x]);
+            $content = preg_replace("/^(partial\(['\"]|render\(['\"])[a-zA-Z0-9-_.]+(['\"]\))/", '', $parts[$x]);       
+            fwrite($fileHandle, $content);
             fclose($fileHandle);  
+            include_once($tmpName);   
         }                   
-        include_once($tmpName);       
+           
         if(isset($includes[$x]) && $includes[$x] == 'content'){
-           include_once(appDir('Views/'.$templateName));
-           continue;
+            $tmp_name = appDir('Views/tmp/content-part.php');
+            $fileContent = file_get_contents(appDir('Views/'.$templateName));
+            $fileHandle = fopen($tmp_name, 'w');           
+            $mainContent = preg_replace("/^(\@layout\(['\"])[a-zA-Z0-9-_.]+(['\"]\))/", '',  $fileContent);       
+            fwrite($fileHandle, $mainContent);
+            fclose($fileHandle);                     
+            include_once($tmp_name);
+            continue;
        }elseif(isset($includes[$x])){
            $file = str_replace('.', '/', $includes[$x]).'.php';
            include_once(appDir('Views/'.$file));
        }        
     }    
 }
-
-/**
- * Includes a given partial or content template  in another template.
- * 
- * @param type $content
- */
-//function render($content)
-//{
-//    $contentFile = str_replace('.', "/", $content);
-//    include_once(appDir('Views/'.$contentFile.'.php'));
-//    
-//}
 
 /**
  * Build an array of all the files in a given directory.
