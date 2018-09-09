@@ -2,4 +2,6 @@
 use App\Http\Route;
 
 Route::get("/", "HomeController@index");
-Route::get("/app-test", "TestController@test");
+Route::get("quick-start", "HomeController@quickStart");
+Route::get("docs", "HomeController@docs");
+Route::get("help", "HomeController@help");
