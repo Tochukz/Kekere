@@ -1,5 +1,5 @@
 @layout('layouts.master')
-<div class="col-sm-6">
+<div class="col-sm-4 col-sm-offset-2">
     <h2>Introduction</h2>
     <p>Kekre is a minimal, light  weight framework. It aims to handle small projects that requires the elegance of an MVC 
        web application while having a light foot print. For this reason Kekere was build as a stand alond framework, hence no 
@@ -43,7 +43,7 @@
 </pre>
     </p>
 </div>
-<div>
+<div class="col-sm-4">
     <h3>Migrations</h3>
     <p>Kekere has a built in migration capability. You can define you table schema for your migration in the <em>Database/Migrations</em> directory.<br />
     Every migration must be defined using the namespace <code>App\Database\Migrations</code> and must extend the <code>App\Database\Migrations\Migration</code> abstract class.
